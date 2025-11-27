@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzeria Tłusty Fraś - Najlepsza Pizza w Mieście</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+            /* --- STYLE BAZOWE --- */
+        :root {
+            --primary-orange: #e67e22;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --text-light: #f4f4f4;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, .navbar-brand, .offcanvas-title, .modal-title {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .text-orange { color: var(--primary-orange) !important; }
+        .bg-features { background-color: #222; }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background-color: rgba(26, 26, 26, 0.95);
+            padding: 15px 0;
+            border-bottom: 2px solid var(--primary-orange);
+            transition: all 0.3s;
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            color: var(--primary-orange) !important;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-size: 1.1rem;
+            margin-left: 15px;
+            transition: color 0.3s;
+        }
+        .nav-link:hover { color: var(--primary-orange) !important; }
+
+        .btn-cart-nav {
+            position: relative;
+            color: #fff;
+            margin-right: 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 5px 15px;
+            background: transparent;
+            transition: 0.3s;
+        }
+        .btn-cart-nav:hover { border-color: var(--primary-orange); color: var(--primary-orange); }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px; right: -8px;
+            background-color: var(--primary-orange);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .btn-order {
+            background-color: var(--primary-orange);
+            color: #fff;
+            padding: 8px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-order:hover { background-color: #d35400; transform: scale(1.05); color: #fff; }
+
+        /* --- HERO --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .hero h1 { font-size: 4rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.5rem; margin-bottom: 40px; font-weight: 300; }
+
+        /* --- SEKCJE --- */
+        .section-padding { padding: 80px 0; }
+        .section-title {
+            text-align: center; font-size: 2.5rem; margin-bottom: 50px;
+            position: relative; display: inline-block; left: 50%; transform: translateX(-50%);
+        }
+        .section-title::after {
+            content: ''; display: block; width: 80px; height: 4px;
+            background-color: var(--primary-orange); margin: 10px auto 0;
+        }
+        .about-img { width: 100%; border-radius: 10px; border: 4px solid var(--primary-orange); }
+
+        /* --- KARTY --- */
+        .menu-section { background-color: var(--darker-bg); }
+        .pizza-card {
+            background-color: #222; border: none; border-radius: 15px;
+            overflow: hidden; transition: transform 0.3s; height: 100%;
+        }
+        .pizza-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(230, 126, 34, 0.2); }
+        .card-img-top { height: 200px; object-fit: cover; }
+        .card-body { padding: 25px; text-align: center; }
+        .pizza-title { color: var(--primary-orange); font-size: 1.5rem; margin-bottom: 10px; }
+        .ingredients { color: #ccc; font-size: 0.9rem; margin-bottom: 20px; font-style: italic; }
+        .price { font-size: 1.4rem; font-weight: 700; color: #fff; }
+
+        /* --- MODAL (Okno wyboru & Formularz) --- */
+        .modal-content {
+            background-color: var(--dark-bg);
+            color: #fff;
+            border: 1px solid #444;
+        }
+        .modal-header, .modal-footer { border-color: #333; }
+        .btn-close-white { filter: invert(1); }
+        .form-check-input:checked {
+            background-color: var(--primary-orange);
+            border-color: var(--primary-orange);
+        }
+        
+        /* Style dla inputów w ciemnym motywie */
+        .form-control, .form-select {
+            background-color: #222;
+            border: 1px solid #444;
+            color: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #222;
+            color: #fff;
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 0.25rem rgba(230, 126, 34, 0.25);
+        }
+        .form-label { color: #ccc; }
+
+        /* --- KOSZYK --- */
+        .offcanvas-dark { background-color: var(--dark-bg); color: #fff; border-left: 1px solid #333; }
+        .offcanvas-header { border-bottom: 1px solid #333; }
+        
+        .cart-item {
+            border-bottom: 1px solid #333; padding: 15px 0;
+            display: flex; justify-content: space-between; align-items: start;
+        }
+        .cart-item-details h6 { margin: 0; color: var(--primary-orange); font-weight: bold; }
+        .cart-item-details small { color: #ccc; font-size: 0.85rem; display: block;}
+        
+        .btn-remove { color: #ff4d4d; background: none; border: none; font-size: 0.8rem; padding: 0; margin-top: 5px; }
+        .btn-remove:hover { color: #ff0000; text-decoration: underline; }
+
+        .cart-summary-box {
+            margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--primary-orange);
+        }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: #ccc; }
+        .summary-total { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; color: #fff; margin-top: 10px;}
+
+        #cart-summary { display: none; }
+
+        /* --- FOOTER --- */
+        .feature-box { text-align: center; padding: 30px; border: 1px solid #333; border-radius: 10px; background: rgba(255,255,255,0.05); }
+        .feature-icon { font-size: 3rem; color: var(--primary-orange); margin-bottom: 20px; }
+        footer { background-color: #000; padding: 50px 0 20px; border-top: 2px solid var(--primary-orange); }
+        .footer-social a { color: #fff; font-size: 1.5rem; margin: 0 10px; }
+        
+        @media (max-width: 768px) { .hero h1 { font-size: 2.5rem; } }
+</style>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-pizza-slice"></i> Tłusty Fraś</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Przełącz nawigację">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#about">O nas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#menu">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Kontakt</a></li>
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <button class="btn-cart-nav" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas">
+                            <i class="fas fa-shopping-basket"></i> Koszyk
+                            <span class="cart-badge" id="cart-count">0</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MODAL WYBORU (Wyskakujące okienko pizzy) -->
+    <div class="modal fade" id="optionsModal" tabindex="-1" aria-labelledby="optionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="optionsModalLabel">Wybierz dodatki</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4 id="modal-pizza-name" class="text-orange mb-3">Nazwa Pizzy</h4>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Rozmiar:</label>
+                        <div class="form-check">
+                            <input class="form-check-input size-radio" type="radio" name="pizzaSize" id="sizeS" value="0" checked>
+                            <label class="form-check-label" for="sizeS">Mała (32cm) - <span id="price-s">0</span> PLN</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input size-radio" type="radio" name="pizzaSize" id="sizeM" value="10">
+                            <label class="form-check-label" for="sizeM">Średnia (42cm) - 49 PLN</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input size-radio" type="radio" name="pizzaSize" id="sizeL" value="18">
+                            <label class="form-check-label" for="sizeL">Duża (50cm) - 59 PLN</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sauceSelect" class="form-label fw-bold">Sos (w cenie):</label>
+                        <select class="form-select" id="sauceSelect">
+                            <option value="Czosnkowy">Czosnkowy</option>
+                            <option value="Pomidorowy">Pomidorowy</option>
+                            <option value="Ostry">Ostry</option>
+                            <option value="BBQ">BBQ</option>
+                            <option value="Brak">Bez sosu</option>
+                        </select>
+                    </div>
+                    <div class="text-end mt-4">
+                        <span class="h4 me-3">Suma: <span id="modal-total-price">0</span> PLN</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-order" id="confirm-add-btn">DODAJ DO KOSZYKA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORMULARZ ZAMÓWIENIA (Płatność) -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="checkoutModalLabel">Twoje Dane i Płatność</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="order-form">
+                        <h6 class="text-orange mb-3"><i class="fas fa-user"></i> Dane Adresowe</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="inputName" class="form-label">Imię i Nazwisko</label>
+                                <input type="text" class="form-control" id="inputName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputPhone" class="form-label">Numer telefonu</label>
+                                <input type="tel" class="form-control" id="inputPhone" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="inputAddress" class="form-label">Ulica i numer domu/lokalu</label>
+                                <input type="text" class="form-control" id="inputAddress" placeholder="np. Smaczna 12/5" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputCity" class="form-label">Miejscowość</label>
+                                <input type="text" class="form-control" id="inputCity" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputZip" class="form-label">Kod pocztowy</label>
+                                <input type="text" class="form-control" id="inputZip">
+                            </div>
+                        </div>
+
+                        <h6 class="text-orange mb-3"><i class="fas fa-credit-card"></i> Metoda Płatności</h6>
+                        <div class="mb-4">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCard" checked>
+                                <label class="form-check-label" for="paymentCard">Karta płatnicza (Online)</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentBlik">
+                                <label class="form-check-label" for="paymentBlik">BLIK</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCash">
+                                <label class="form-check-label" for="paymentCash">Gotówka przy odbiorze</label>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-dark border-secondary text-center">
+                            Do zapłaty: <span class="fw-bold text-orange" id="checkout-total-price">0</span> PLN
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-order px-5">ZAMAWIAM I PŁACĘ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KOSZYK (OFFCANVAS) -->
+    <div class="offcanvas offcanvas-end offcanvas-dark" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="cartOffcanvasLabel">Twoje Zamówienie</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <!-- Lista produktów -->
+            <div id="cart-items-container" class="flex-grow-1">
+                <p class="text-center text-muted mt-5">Koszyk jest pusty.<br>Dodaj coś pysznego!</p>
+            </div>
+            
+            <!-- Podsumowanie -->
+            <div id="cart-summary">
+                <div class="cart-summary-box">
+                    <div class="summary-row">
+                        <span>Wartość koszyka:</span>
+                        <span><span id="cart-subtotal">0</span> PLN</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Dostawa:</span>
+                        <span>7 PLN</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>RAZEM:</span>
+                        <span class="text-orange"><span id="cart-grand-total">0</span> PLN</span>
+                    </div>
+                    <!-- Zmieniono przycisk na id="checkout-btn" -->
+                    <button class="btn btn-order w-100 mt-3" id="checkout-btn">PRZEJDŹ DO PŁATNOŚCI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <h1>Pizza, która nie pyta<br><span>O KALORIE</span></h1>
+            <p>Prawdziwy ser, chrupiące ciasto i składniki, których nie żałujemy.<br>Witaj w królestwie Tłustego Frasia.</p>
+            <a href="#menu" class="btn btn-order btn-lg px-5 py-3">SPRAWDŹ MENU</a>
+        </div>
+    </section>
+
+    <!-- O NAS -->
+    <section id="about" class="section-padding">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=1920&auto=format&fit=crop" alt="Pizzerman" class="about-img">
+                </div>
+                <div class="col-md-6 ps-md-5">
+                    <h2 class="mb-4">Kim jest <span class="text-orange">Tłusty Fraś?</span></h2>
+                    <p class="lead">To nie jest miejsce dla ludzi liczących listki sałaty. To miejsce dla tych, którzy kochają jeść.</p>
+                    <p>Nasza filozofia jest prosta: ciasto wyrabiamy ręcznie codziennie rano, sos robimy z włoskich pomidorów, a sera sypiemy tyle, żeby się ciągnął aż do sąsiedniego stolika.</p>
+                    <p><i class="fas fa-check-circle text-orange"></i> Świeże składniki</p>
+                    <p><i class="fas fa-check-circle text-orange"></i> Oryginalne receptury</p>
+                    <p><i class="fas fa-check-circle text-orange"></i> Atmosfera jak u szwagra</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IKONY / DLACZEGO MY -->
+    <section class="py-5 bg-features">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <i class="fas fa-fire feature-icon"></i>
+                        <h4>Piec Opalany Drewnem</h4>
+                        <p class="text-secondary">Sekret chrupkości naszych brzegów.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <i class="fas fa-motorcycle feature-icon"></i>
+                        <h4>Szybka Dostawa</h4>
+                        <p class="text-secondary">Pizza dojedzie gorąca.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <i class="fas fa-utensils feature-icon"></i>
+                        <h4>Domowe Sosy</h4>
+                        <p class="text-secondary">Czosnkowy robimy sami.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MENU -->
+    <section id="menu" class="section-padding menu-section">
+        <div class="container">
+            <h2 class="section-title">Menu</h2>
+            <div class="row g-4">
+                
+                <!-- Pizza 1 -->
+                <div class="col-md-4">
+                    <div class="card pizza-card">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="pizza-title">Fraś Klasyk</h5>
+                            <p class="ingredients">Sos pomidorowy, podwójna mozzarella, bazylia, oliwa czosnkowa.</p>
+                            <div class="price">32 PLN </div>
+                            <button class="btn btn-outline-light mt-3 rounded-pill btn-sm open-options-btn" 
+                                    data-name="Fraś Klasyk" data-base-price="32">
+                                Wybierz opcje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pizza 2 -->
+                <div class="col-md-4">
+                    <div class="card pizza-card">
+                        <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="pizza-title">Mięsny Jeż</h5>
+                            <p class="ingredients">Sos BBQ, mozzarella, boczek, salami pepperoni, kurczak, cebula.</p>
+                            <div class="price">45 PLN </div>
+                            <button class="btn btn-outline-light mt-3 rounded-pill btn-sm open-options-btn" 
+                                    data-name="Mięsny Jeż" data-base-price="45">
+                                Wybierz opcje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pizza 3 -->
+                <div class="col-md-4">
+                    <div class="card pizza-card">
+                        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="pizza-title">Piekielny Fraś 🌶️</h5>
+                            <p class="ingredients">Sos ostry, mozzarella, chorizo, papryczki jalapeño, tabasco.</p>
+                            <div class="price">42 PLN </div>
+                            <button class="btn btn-outline-light mt-3 rounded-pill btn-sm open-options-btn" 
+                                    data-name="Piekielny Fraś" data-base-price="42">
+                                Wybierz opcje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pizza 4 -->
+                <div class="col-md-4">
+                    <div class="card pizza-card">
+                        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="pizza-title">Wiejska Chata</h5>
+                            <p class="ingredients">Sos śmietanowy, boczek, kiełbasa, ogórek kiszony, cebula.</p>
+                            <div class="price">39 PLN </div>
+                            <button class="btn btn-outline-light mt-3 rounded-pill btn-sm open-options-btn" 
+                                    data-name="Wiejska Chata" data-base-price="39">
+                                Wybierz opcje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pizza 5 -->
+                <div class="col-md-4">
+                    <div class="card pizza-card">
+                        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="pizza-title">Cztery Sery</h5>
+                            <p class="ingredients">Gorgonzola, mozzarella, parmezan, camembert, orzechy.</p>
+                            <div class="price">41 PLN </div>
+                            <button class="btn btn-outline-light mt-3 rounded-pill btn-sm open-options-btn" 
+                                    data-name="Cztery Sery" data-base-price="41">
+                                Wybierz opcje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pizza 6 -->
+                <div class="col-md-4">
+                    <div class="card pizza-card">
+                        <img src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?q=80&w=800&auto=format&fit=crop" class="card-img-top" alt="Pizza">
+                        <div class="card-body">
+                            <h5 class="pizza-title">Wege Uczta</h5>
+                            <p class="ingredients">Sos pomidorowy, pieczarki, papryka, kukurydza, rukola, pomidorki.</p>
+                            <div class="price">36 PLN </div>
+                            <button class="btn btn-outline-light mt-3 rounded-pill btn-sm open-options-btn" 
+                                    data-name="Wege Uczta" data-base-price="36">
+                                Wybierz opcje
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER / KONTAKT -->
+    <footer id="contact">
+        <div class="container">
+            <div class="row text-center text-md-start">
+                <div class="col-md-4 mb-4">
+                    <h4 class="text-white mb-3">Tłusty Fraś</h4>
+                    <p class="text-secondary">Najlepsza pizza w mieście, robiona z pasją.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4 class="text-white mb-3">Kontakt</h4>
+                    <p class="text-secondary mb-1"><i class="fas fa-map-marker-alt me-2 text-orange"></i> ul. Smaczna 12, Warszawa</p>
+                    <p class="text-secondary mb-1"><i class="fas fa-phone me-2 text-orange"></i> +48 123 456 789</p>
+                    <p class="text-secondary"><i class="fas fa-envelope me-2 text-orange"></i> jedz@tlustyfras.pl</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4 class="text-white mb-3">Social</h4>
+                    <div class="footer-social mt-3">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4 pt-4 border-top border-secondary text-secondary small">
+                &copy; 2023 Tłusty Fraś Pizzeria.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- ZMIENNE GLOBALNE ---
+        let cart = [];
+        const DELIVERY_FEE = 7;
+        
+        // Zmienne tymczasowe (dla Modala pizzy)
+        let currentPizzaName = "";
+        let currentBasePrice = 0;
+        
+        // Elementy DOM
+        const modalEl = document.getElementById('optionsModal');
+        const optionsModal = new bootstrap.Modal(modalEl);
+        
+        const modalPizzaName = document.getElementById('modal-pizza-name');
+        const modalPriceDisplay = document.getElementById('modal-total-price');
+        const priceSDisplay = document.getElementById('price-s');
+        const confirmAddBtn = document.getElementById('confirm-add-btn');
+        const sizeRadios = document.querySelectorAll('.size-radio');
+        
+        // Elementy Koszyka
+        const cartCountEl = document.getElementById('cart-count');
+        const cartContainer = document.getElementById('cart-items-container');
+        const cartSummary = document.getElementById('cart-summary');
+        const subtotalEl = document.getElementById('cart-subtotal');
+        const grandTotalEl = document.getElementById('cart-grand-total');
+
+        // Elementy Modala Zamówienia (Nowe)
+        const checkoutModalEl = document.getElementById('checkoutModal');
+        const checkoutModal = new bootstrap.Modal(checkoutModalEl);
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const checkoutTotalPriceEl = document.getElementById('checkout-total-price');
+        const orderForm = document.getElementById('order-form');
+
+
+        // --- 1. OTWIERANIE MODALA WYBORU ---
+        document.querySelectorAll('.open-options-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentPizzaName = btn.getAttribute('data-name');
+                currentBasePrice = parseInt(btn.getAttribute('data-base-price'));
+
+                modalPizzaName.innerText = currentPizzaName;
+                priceSDisplay.innerText = currentBasePrice;
+
+                document.getElementById('sizeS').checked = true;
+                document.getElementById('sauceSelect').selectedIndex = 0;
+
+                updateModalPrice();
+                optionsModal.show();
+            });
+        });
+
+        // --- 2. AKTUALIZACJA CENY W MODALU PIZZY ---
+        function updateModalPrice() {
+            let sizeMarkup = 0;
+            sizeRadios.forEach(radio => {
+                if(radio.checked) sizeMarkup = parseInt(radio.value);
+            });
+            modalPriceDisplay.innerText = currentBasePrice + sizeMarkup;
+        }
+
+        sizeRadios.forEach(radio => {
+            radio.addEventListener('change', updateModalPrice);
+        });
+
+        // --- 3. DODAWANIE DO KOSZYKA ---
+        confirmAddBtn.addEventListener('click', () => {
+            let selectedSizeMarkup = 0;
+            let sizeName = "Mała";
+            
+            sizeRadios.forEach(radio => {
+                if(radio.checked) {
+                    selectedSizeMarkup = parseInt(radio.value);
+                    if(selectedSizeMarkup === 0) sizeName = "Mała (32cm)";
+                    if(selectedSizeMarkup === 10) sizeName = "Średnia (42cm)";
+                    if(selectedSizeMarkup === 18) sizeName = "Duża (50cm)";
+                }
+            });
+
+            const finalPrice = currentBasePrice + selectedSizeMarkup;
+            const selectedSauce = document.getElementById('sauceSelect').value;
+
+            const existingItem = cart.find(item => 
+                item.name === currentPizzaName && 
+                item.size === sizeName && 
+                item.sauce === selectedSauce
+            );
+
+            if (existingItem) {
+                existingItem.qty++;
+            } else {
+                cart.push({
+                    name: currentPizzaName,
+                    basePrice: currentBasePrice,
+                    finalPrice: finalPrice,
+                    size: sizeName,
+                    sauce: selectedSauce,
+                    qty: 1
+                });
+            }
+
+            optionsModal.hide();
+            updateCartUI();
+
+            const cartOffcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
+            cartOffcanvas.show();
+        });
+
+        // --- 4. AKTUALIZACJA KOSZYKA ---
+        function updateCartUI() {
+            cartContainer.innerHTML = '';
+            
+            let totalQty = 0;
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p class="text-center text-muted mt-5">Koszyk jest pusty.<br>Dodaj coś pysznego!</p>';
+                cartSummary.style.display = 'none';
+            } else {
+                cart.forEach((item, index) => {
+                    totalQty += item.qty;
+                    subtotal += item.finalPrice * item.qty;
+
+                    const div = document.createElement('div');
+                    div.classList.add('cart-item');
+                    div.innerHTML = `
+                        <div class="cart-item-details">
+                            <h6>${item.name}</h6>
+                            <small>${item.size}</small>
+                            <small>Sos: ${item.sauce}</small>
+                            <small class="text-muted">${item.finalPrice} PLN x ${item.qty}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold">${item.finalPrice * item.qty} PLN</span><br>
+                            <button class="btn-remove" onclick="removeFromCart(${index})">Usuń</button>
+                        </div>
+                    `;
+                    cartContainer.appendChild(div);
+                });
+                cartSummary.style.display = 'block';
+            }
+
+            const grandTotal = subtotal > 0 ? subtotal + DELIVERY_FEE : 0;
+
+            cartCountEl.innerText = totalQty;
+            subtotalEl.innerText = subtotal;
+            grandTotalEl.innerText = grandTotal;
+        }
+
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // --- 5. OBSŁUGA PŁATNOŚCI (NOWE) ---
+        
+        // Kliknięcie "Przejdź do płatności"
+        checkoutBtn.addEventListener('click', () => {
+            // Pobierz aktualną sumę z koszyka
+            const total = document.getElementById('cart-grand-total').innerText;
+            checkoutTotalPriceEl.innerText = total;
+
+            // Ukryj koszyk Offcanvas
+            const cartOffcanvasEl = document.getElementById('cartOffcanvas');
+            const cartOffcanvas = bootstrap.Offcanvas.getInstance(cartOffcanvasEl);
+            cartOffcanvas.hide();
+
+            // Pokaż formularz
+            checkoutModal.show();
+        });
+
+        // Wysłanie formularza
+        orderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Tutaj normalnie byłaby wysyłka danych na serwer
+            alert("Dziękujemy za zamówienie! Twoja pizza jest już w drodze!");
+            
+            // Wyczyść wszystko
+            checkoutModal.hide();
+            cart = [];
+            updateCartUI();
+            orderForm.reset();
+        });
+
+        // Mobilne menu
+        const navLinks = document.querySelectorAll('.nav-link');
+        const menuToggle = document.getElementById('navbarNav');
+        const bsCollapse = new bootstrap.Collapse(menuToggle, {toggle: false});
+        navLinks.forEach((l) => {
+            l.addEventListener('click', () => {
+                if(menuToggle.classList.contains('show')) bsCollapse.toggle();
+            })
+        });
+    </script>
+</body>
+</html>
